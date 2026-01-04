@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки сервера | Aurora Bot Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 10%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b00ff 0%, #4a00e0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .server-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .server-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #8b00ff 0%, #4a00e0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .server-info h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .server-info p {
+            opacity: 0.7;
+        }
+
+        .settings-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .settings-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .settings-content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 16px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            background: #7289DA;
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #677bc4;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <div class="avatar">👤</div>
+            <div>
+                <h3><%= user.username %></h3>
+                <p>ID: <%= user.id %></p>
+            </div>
+        <div class="nav">
+            <a href="/servers">Серверы</a>
+            <a href="/auth/logout">Выход</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="server-header">
+            <div class="server-icon">🏰</div>
+            <div class="server-info">
+                <h1><%= server.name %></h1>
+                <p>ID сервера: <%= server.id %></p>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <div class="sidebar">
+                <h3>Настройки</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active">Общие</a></li>
+                    <li><a href="#">Модерация</a></li>
+                    <li><a href="#">Уровни</a></li>
+                    <li><a href="#">Экономика</a></li>
+                    <li><a href="#">Тикеты</a></li>
+                    <li><a href="#">События</a></li>
+                    <li><a href="#">Работа</a></li>
+                    <li><a href="#">Музыка</a></li>
+                    <li><a href="#">Реакции</a></li>
+                    <li><a href="#">Автовороли</a></li>
+                </ul>
+            </div>
+            
+            <script>
+                // Делаем пункты меню интерактивными
+                document.addEventListener('DOMContentLoaded', function() {
+                    const menuItems = document.querySelectorAll('.sidebar-menu a');
+                    const formGroups = document.querySelectorAll('.form-group');
+                    
+                    menuItems.forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            
+                            // Убираем активный класс со всех пунктов
+                            menuItems.forEach(i => i.classList.remove('active'));
+                            
+                            // Добавляем активный класс к текущему пункту
+                            this.classList.add('active');
+                            
+                            // Показываем соответствующий раздел настроек
+                            const section = this.textContent.trim().toLowerCase();
+                            
+                            // Скрываем все группы настроек
+                            formGroups.forEach(group => {
+                                const heading = group.querySelector('h3');
+                                if (heading) {
+                                    if (heading.textContent.toLowerCase().includes(section) ||
+                                        (section === 'общие' && !['модерация', 'уровни', 'экономика', 'тикеты', 'события', 'работа', 'музыка', 'реакции', 'автовороли'].some(s => heading.textContent.toLowerCase().includes(s)))) {
+                                        group.style.display = 'block';
+                                    } else {
+                                        group.style.display = 'none';
+                                    }
+                                }
+                            });
+                            
+                            // Для раздела "Общие" показываем также основные настройки
+                            if (section === 'общие') {
+                                document.querySelector('h2').style.display = 'block';
+                                document.querySelector('h2').nextElementSibling.style.display = 'block';
+                            }
+                        });
+                    });
+                    
+                    // При загрузке страницы показываем только общие настройки
+                    window.onload = function() {
+                        const allFormGroups = Array.from(formGroups);
+                        const generalSections = ['Модерация', 'Логирование', 'Система уровней', 'Экономика', 'Система тикетов', 'События', 'Работа', 'Музыка', 'Реакции', 'Автовороли'];
+                        
+                        allFormGroups.forEach(group => {
+                            const heading = group.querySelector('h3');
+                            if (heading && generalSections.includes(heading.textContent.trim())) {
+                                // Эти группы показываем
+                            } else if (!heading) {
+                                // Основную группу (префикс) тоже показываем
+                            } else {
+                                group.style.display = 'none';
+                            }
+                        });
+                    };
+                });
+            </script>
+
+            <div class="settings-content">
+                <h2>Общие настройки</h2>
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label for="prefix">Префикс команд</label>
+                        <input type="text" id="prefix" name="prefix" value="<%= settings.prefix %>">
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Модерация</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="automod-enabled" name="automod[enabled]" <%= settings.automod.enabled ? 'checked' : '' %>>
+                            <label for="automod-enabled">Включить автомодерацию</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="automod-profanity" name="automod[filter][profanity]" <%= settings.automod.filter.profanity ? 'checked' : '' %>>
+                            <label for="automod-profanity">Фильтр ненормативной лексики</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="automod-links" name="automod[filter][links]" <%= settings.automod.filter.links ? 'checked' : '' %>>
+                            <label for="automod-links">Фильтр ссылок</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="automod-spam" name="automod[filter][spam]" <%= settings.automod.filter.spam ? 'checked' : '' %>>
+                            <label for="automod-spam">Фильтр спама</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="automod-caps" name="automod[filter][caps]" <%= settings.automod.filter.caps ? 'checked' : '' %>>
+                            <label for="automod-caps">Фильтр капса</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="automod-invites" name="automod[filter][invites]" <%= settings.automod.filter.invites ? 'checked' : '' %>>
+                            <label for="automod-invites">Фильтр приглашений на другие серверы</label>
+                        </div>
+                        
+                        <label for="automod-warn-threshold">Порог предупреждений для мута</label>
+                        <input type="number" id="automod-warn-threshold" name="automod[actions][warn]" value="<%= settings.automod.actions.warn %>" min="1" max="20">
+                        
+                        <label for="automod-mute-threshold">Порог предупреждений для кика</label>
+                        <input type="number" id="automod-mute-threshold" name="automod[actions][mute]" value="<%= settings.automod.actions.mute %>" min="1" max="20">
+                        
+                        <label for="automod-kick-threshold">Порог предупреждений для бана</label>
+                        <input type="number" id="automod-kick-threshold" name="automod[actions][kick]" value="<%= settings.automod.actions.kick %>" min="1" max="20">
+                        
+                        <label for="automod-ban-threshold">Порог предупреждений для постоянного бана</label>
+                        <input type="number" id="automod-ban-threshold" name="automod[actions][ban]" value="<%= settings.automod.actions.ban %>" min="1" max="20">
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Логирование</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="logging-enabled" name="logging[enabled]" <%= settings.logging.enabled ? 'checked' : '' %>>
+                            <label for="logging-enabled">Включить логирование</label>
+                        </div>
+                        
+                        <label for="log-channel">ID канала для логов</label>
+                        <input type="text" id="log-channel" name="logging[logChannel]" value="<%= settings.logging.logChannel || '' %>">
+                        <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Введите ID текстового канала для отправки логов</p>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-message-delete" name="logging[events][messageDelete]" <%= settings.logging.events.messageDelete ? 'checked' : '' %>>
+                            <label for="log-message-delete">Логировать удаление сообщений</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-message-update" name="logging[events][messageUpdate]" <%= settings.logging.events.messageUpdate ? 'checked' : '' %>>
+                            <label for="log-message-update">Логировать изменение сообщений</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-join" name="logging[events][memberJoin]" <%= settings.logging.events.memberJoin ? 'checked' : '' %>>
+                            <label for="log-member-join">Логировать присоединение участников</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-leave" name="logging[events][memberLeave]" <%= settings.logging.events.memberLeave ? 'checked' : '' %>>
+                            <label for="log-member-leave">Логировать выход участников</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-ban" name="logging[events][memberBan]" <%= settings.logging.events.memberBan ? 'checked' : '' %>>
+                            <label for="log-member-ban">Логировать бан участников</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-unban" name="logging[events][memberUnban]" <%= settings.logging.events.memberUnban ? 'checked' : '' %>>
+                            <label for="log-member-unban">Логировать разбан участников</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-role-add" name="logging[events][memberRoleAdd]" <%= settings.logging.events.memberRoleAdd ? 'checked' : '' %>>
+                            <label for="log-member-role-add">Логировать выдачу ролей</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-role-remove" name="logging[events][memberRoleRemove]" <%= settings.logging.events.memberRoleRemove ? 'checked' : '' %>>
+                            <label for="log-member-role-remove">Логировать снятие ролей</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-member-nickname-update" name="logging[events][memberNicknameUpdate]" <%= settings.logging.events.memberNicknameUpdate ? 'checked' : '' %>>
+                            <label for="log-member-nickname-update">Логировать изменение никнеймов</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="log-voice-state-update" name="logging[events][voiceStateUpdate]" <%= settings.logging.events.voiceStateUpdate ? 'checked' : '' %>>
+                            <label for="log-voice-state-update">Логировать изменения в голосовых каналах</label>
+                        </div>
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Система уровней</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="leveling-enabled" name="leveling[enabled]" <%= settings.leveling.enabled ? 'checked' : '' %>>
+                            <label for="leveling-enabled">Включить систему уровней</label>
+                        </div>
+                        
+                        <label for="xp-min">Минимальное количество XP за сообщение</label>
+                        <input type="number" id="xp-min" name="leveling[xpPerMessageMin]" value="<%= settings.leveling.xpPerMessageMin %>" min="1" max="100">
+                        
+                        <label for="xp-max">Максимальное количество XP за сообщение</label>
+                        <input type="number" id="xp-max" name="leveling[xpPerMessageMax]" value="<%= settings.leveling.xpPerMessageMax %>" min="1" max="100">
+                        
+                        <label for="xp-cooldown">Задержка между начислением XP (мс)</label>
+                        <input type="number" id="xp-cooldown" name="leveling[xpCooldownMs]" value="<%= settings.leveling.xpCooldownMs %>" min="1000" max="300000">
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Экономика</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="economy-enabled" name="economy[enabled]" <%= settings.economy.enabled ? 'checked' : '' %>>
+                            <label for="economy-enabled">Включить экономическую систему</label>
+                        </div>
+                        
+                        <label for="daily-amount">Количество монет за ежедневную награду</label>
+                        <input type="number" id="daily-amount" name="economy[dailyAmount]" value="<%= settings.economy.dailyAmount %>" min="1" max="1000">
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="work-enabled" name="economy[workEnabled]" <%= settings.economy.workEnabled ? 'checked' : '' %>>
+                            <label for="work-enabled">Включить команду /work</label>
+                        </div>
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Система тикетов</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="tickets-enabled" name="tickets[enabled]" <%= settings.tickets.enabled ? 'checked' : '' %>>
+                            <label for="tickets-enabled">Включить систему тикетов</label>
+                        </div>
+                        
+                        <label for="tickets-category">ID категории для тикетов</label>
+                        <input type="text" id="tickets-category" name="tickets[categoryId]" value="<%= settings.tickets.categoryId || '' %>">
+                        <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Введите ID категории, в которой будут создаваться тикеты</p>
+                        
+                        <label for="tickets-support-role">ID роли поддержки (опционально)</label>
+                        <input type="text" id="tickets-support-role" name="tickets[supportRoleId]" value="<%= settings.tickets.supportRoleId || '' %>">
+                        <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Введите ID роли, которая будет получать уведомления о новых тикетах</p>
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>События</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="events-enabled" name="events[enabled]" <%= settings.events.enabled ? 'checked' : '' %>>
+                            <label for="events-enabled">Включить систему событий</label>
+                        </div>
+                        
+                        <label for="events-announcement-channel">ID канала для объявлений о событиях</label>
+                        <input type="text" id="events-announcement-channel" name="events[announcementChannel]" value="<%= settings.events.announcementChannel || '' %>">
+                        <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Введите ID канала, в котором будут публиковаться объявления о событиях</p>
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Работа</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="work-enabled" name="work[enabled]" <%= settings.work.enabled ? 'checked' : '' %>>
+                            <label for="work-enabled">Включить команду /work</label>
+                        </div>
+                        
+                        <label for="work-min-reward">Минимальное вознаграждение за работу</label>
+                        <input type="number" id="work-min-reward" name="work[minReward]" value="<%= settings.work.minReward %>" min="1" max="1000">
+                        
+                        <label for="work-max-reward">Максимальное вознаграждение за работу</label>
+                        <input type="number" id="work-max-reward" name="work[maxReward]" value="<%= settings.work.maxReward %>" min="1" max="1000">
+                        
+                        <label for="work-cooldown">Время восстановления (часы)</label>
+                        <input type="number" id="work-cooldown" name="work[cooldownHours]" value="<%= settings.work.cooldownHours %>" min="1" max="24">
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Музыка</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="music-enabled" name="music[enabled]" <%= settings.music.enabled ? 'checked' : '' %>>
+                            <label for="music-enabled">Включить музыкальные команды</label>
+                        </div>
+                        
+                        <label for="music-max-queue">Максимальный размер очереди</label>
+                        <input type="number" id="music-max-queue" name="music[maxQueueSize]" value="<%= settings.music.maxQueueSize %>" min="10" max="500">
+                        
+                        <label for="music-max-duration">Максимальная длительность трека (секунды)</label>
+                        <input type="number" id="music-max-duration" name="music[maxTrackDuration]" value="<%= settings.music.maxTrackDuration %>" min="60" max="3600">
+                        
+                        <label for="music-quality">Качество аудио (1-5)</label>
+                        <input type="number" id="music-quality" name="music[audioQuality]" value="<%= settings.music.audioQuality %>" min="1" max="5">
+                        
+                        <label for="music-max-retry">Максимальное количество попыток</label>
+                        <input type="number" id="music-max-retry" name="music[maxRetryAttempts]" value="<%= settings.music.maxRetryAttempts %>" min="1" max="10">
+                        
+                        <label for="music-stream-timeout">Таймаут потока (мс)</label>
+                        <input type="number" id="music-stream-timeout" name="music[streamTimeout]" value="<%= settings.music.streamTimeout %>" min="10000" max="120000">
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Реакции</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="reactions-enabled" name="reactions[enabled]" <%= settings.reactions.enabled ? 'checked' : '' %>>
+                            <label for="reactions-enabled">Включить систему реакций</label>
+                        </div>
+                    </div>
+            
+                    <div class="form-group">
+                        <h3>Автовороли</h3>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="autoroles-enabled" name="autoroles[enabled]" <%= settings.autoroles.enabled ? 'checked' : '' %>>
+                            <label for="autoroles-enabled">Включить автовороли для новых участников</label>
+                        </div>
+                        
+                        <label for="autoroles-role-id">ID роли для выдачи новым участникам</label>
+                        <input type="text" id="autoroles-role-id" name="autoroles[roleId]" value="<%= settings.autoroles.roleId || '' %>">
+                        <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Введите ID роли, которая будет автоматически выдаваться новым участникам сервера</p>
+                    </div>
+            
+                    <button type="submit" class="btn">Сохранить настройки</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Собираем данные формы в объект
+            const formElements = this.querySelectorAll('input, select, textarea');
+            const settings = {};
+            
+            formElements.forEach(element => {
+                if (element.type === 'checkbox') {
+                    // Обработка чекбоксов
+                    const name = element.name;
+                    if (name.includes('[')) {
+                        const keys = name.replace(/]/g, '').split('[');
+                        let current = settings;
+                        
+                        for (let i = 0; i < keys.length - 1; i++) {
+                            if (!current[keys[i]]) {
+                                current[keys[i]] = {};
+                            }
+                            current = current[keys[i]];
+                        }
+                        
+                        current[keys[keys.length - 1]] = element.checked;
+                    } else {
+                        settings[name] = element.checked;
+                    }
+                } else {
+                    // Обработка остальных элементов (текст, числа и т.д.)
+                    const name = element.name;
+                    if (name.includes('[')) {
+                        const keys = name.replace(/]/g, '').split('[');
+                        let current = settings;
+                        
+                        for (let i = 0; i < keys.length - 1; i++) {
+                            if (!current[keys[i]]) {
+                                current[keys[i]] = {};
+                            }
+                            current = current[keys[i]];
+                        }
+                        
+                        // Преобразуем числовые значения
+                        if (element.type === 'number') {
+                            current[keys[keys.length - 1]] = parseFloat(element.value) || element.value;
+                        } else {
+                            current[keys[keys.length - 1]] = element.value;
+                        }
+                    } else {
+                        // Преобразуем числовые значения
+                        if (element.type === 'number') {
+                            settings[name] = parseFloat(element.value) || element.value;
+                        } else {
+                            settings[name] = element.value;
+                        }
+                    }
+                }
+            });
+            
+            // Отправка данных на сервер
+            fetch(`/api/server/<%= server.id %>/settings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Настройки успешно сохранены!');
+                } else {
+                    alert('Ошибка при сохранении настроек: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при сохранении настроек');
+            });
+        });
+    </script>
+</body>
+</html>
